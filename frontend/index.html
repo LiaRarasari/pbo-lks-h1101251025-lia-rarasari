@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Perpustakaan - Frontend</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; line-height: 1.6; }
+        h1, h2 { color: #333; }
+        .section { margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 6px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f4f4f4; }
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; background: #e0f2fe; color: #0369a1; }
+    </style>
+</head>
+<body>
+    <h1>Katalog Perpustakaan</h1>
+
+    <div class="section">
+        <h2>Daftar Kategori</h2>
+        <div id="category-status">Memuat data kategori...</div>
+        <table id="category-table" style="display: none;">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nama Kategori</th>
+                    <th>Deskripsi</th>
+                </tr>
+            </thead>
+            <tbody id="category-list"></tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Daftar Buku</h2>
+        <div id="book-status">Memuat data buku...</div>
+        <table id="book-table" style="display: none;">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Judul</th>
+                    <th>Pengarang</th>
+                    <th>Tahun</th>
+                    <th>Stok</th>
+                </tr>
+            </thead>
+            <tbody id="book-list"></tbody>
+        </table>
+    </div>
+
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
