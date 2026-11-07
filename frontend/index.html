@@ -3,25 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Perpustakaan - Dashboard & Buku</title>
+    <title>Sistem Perpustakaan - Integrasi Penuh</title>
     <style>
         * { box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; background-color: #f8fafc; color: #1e293b; }
-        .navbar { background-color: #1e40af; color: white; padding: 15px 30px; font-size: 1.25rem; font-weight: bold; }
+        .navbar { background-color: #1e40af; color: white; padding: 15px 30px; font-size: 1.25rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
         .container { max-width: 1100px; margin: 25px auto; padding: 0 20px; }
         
-        /* Dashboard Card Grid */
+        /* Nav Tabs */
+        .tabs { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid #e2e8f0; }
+        .tab-btn { padding: 10px 20px; border: none; background: none; font-size: 1rem; font-weight: 600; color: #64748b; cursor: pointer; border-bottom: 3px solid transparent; }
+        .tab-btn.active { color: #1e40af; border-bottom-color: #1e40af; }
+
+        /* Stats Grid */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .card { background: white; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .card h3 { margin: 0 0 10px 0; font-size: 0.9rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
         .card .value { font-size: 2rem; font-weight: bold; color: #1e293b; }
 
-        /* Form & Tables */
+        /* Panels */
         .panel { background: white; padding: 25px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 30px; }
         .panel h2 { margin-top: 0; font-size: 1.2rem; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
         .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: #475569; }
-        .form-group input, .form-group select { width: 100%; padding: 9px; border: 1px solid #cbd5e1; border-radius: 5px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 9px; border: 1px solid #cbd5e1; border-radius: 5px; font-family: inherit; }
         
         /* Buttons */
         .btn { padding: 9px 18px; border: none; border-radius: 5px; font-weight: 600; cursor: pointer; }
@@ -29,9 +34,8 @@
         .btn-primary:hover { background: #1d4ed8; }
         .btn-danger { background: #ef4444; color: white; padding: 5px 10px; font-size: 0.8rem; }
         .btn-danger:hover { background: #dc2626; }
-        .btn-cancel { background: #94a3b8; color: white; display: none; }
 
-        /* Table */
+        /* Tables & Alerts */
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: left; }
         th { background: #f8fafc; color: #475569; font-size: 0.85rem; text-transform: uppercase; }
@@ -39,11 +43,16 @@
         .alert { padding: 12px; border-radius: 6px; margin-bottom: 15px; display: none; font-size: 0.9rem; }
         .alert-success { background: #dcfce7; color: #15803d; }
         .alert-error { background: #fee2e2; color: #b91c1c; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
 <body>
 
-    <div class="navbar">Sistem Informasi Perpustakaan</div>
+    <div class="navbar">
+        <span>Sistem Informasi Perpustakaan</span>
+    </div>
 
     <div class="container">
         <!-- Notifikasi -->
@@ -65,52 +74,94 @@
             </div>
         </div>
 
-        <!-- Form Tambah/Edit Buku -->
-        <div class="panel">
-            <h2 id="form-title">Tambah Buku Baru</h2>
-            <form id="book-form">
-                <input type="hidden" id="book-id">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Judul Buku</label>
-                        <input type="text" id="judul" required placeholder="Contoh: Belajar PHP Modern">
-                    </div>
-                    <div class="form-group">
-                        <label>Penulis</label>
-                        <input type="text" id="penulis" required placeholder="Contoh: Lia Rarasari">
-                    </div>
-                    <div class="form-group">
-                        <label>Tahun Terbit</label>
-                        <input type="number" id="tahun" required placeholder="Contoh: 2026">
-                    </div>
-                    <div class="form-group">
-                        <label>Jumlah Stok</label>
-                        <input type="number" id="stok" required min="0" placeholder="Contoh: 10">
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary" id="btn-submit">Simpan Buku</button>
-                <button type="button" class="btn btn-cancel" id="btn-cancel" onclick="resetForm()">Batal</button>
-            </form>
+        <!-- Navigasi Menu Tab -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('books')">Katalog Buku</button>
+            <button class="tab-btn" onclick="switchTab('categories')">Kelola Kategori</button>
         </div>
 
-        <!-- Tabel Daftar Buku -->
-        <div class="panel">
-            <h2>Katalog Buku</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Judul</th>
-                        <th>Penulis</th>
-                        <th>Tahun</th>
-                        <th>Stok</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="book-list">
-                    <tr><td colspan="6" style="text-align: center; color: #64748b;">Memuat data buku...</td></tr>
-                </tbody>
-            </table>
+        <!-- TAB 1: KELOLA BUKU -->
+        <div id="tab-books" class="tab-content active">
+            <div class="panel">
+                <h2>Tambah Buku Baru</h2>
+                <form id="book-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Judul Buku</label>
+                            <input type="text" id="judul" required placeholder="Contoh: Belajar PHP Modern">
+                        </div>
+                        <div class="form-group">
+                            <label>Penulis</label>
+                            <input type="text" id="penulis" required placeholder="Contoh: Lia Rarasari">
+                        </div>
+                        <div class="form-group">
+                            <label>Tahun Terbit</label>
+                            <input type="number" id="tahun" required placeholder="Contoh: 2026">
+                        </div>
+                        <div class="form-group">
+                            <label>Jumlah Stok</label>
+                            <input type="number" id="stok" required min="0" placeholder="Contoh: 10">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Simpan Buku</button>
+                </form>
+            </div>
+
+            <div class="panel">
+                <h2>Katalog Buku</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Judul</th>
+                            <th>Penulis</th>
+                            <th>Tahun</th>
+                            <th>Stok</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="book-list">
+                        <tr><td colspan="6" style="text-align: center; color: #64748b;">Memuat data buku...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 2: KELOLA KATEGORI -->
+        <div id="tab-categories" class="tab-content">
+            <div class="panel">
+                <h2>Tambah Kategori Baru</h2>
+                <form id="category-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nama Kategori</label>
+                            <input type="text" id="cat-nama" required placeholder="Contoh: Sains Komputer">
+                        </div>
+                        <div class="form-group">
+                            <label>Deskripsi</label>
+                            <input type="text" id="cat-deskripsi" placeholder="Contoh: Buku seputar ilmu komputer dan TI">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Simpan Kategori</button>
+                </form>
+            </div>
+
+            <div class="panel">
+                <h2>Daftar Kategori</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nama Kategori</th>
+                            <th>Deskripsi</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="category-list">
+                        <tr><td colspan="4" style="text-align: center; color: #64748b;">Memuat data kategori...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
